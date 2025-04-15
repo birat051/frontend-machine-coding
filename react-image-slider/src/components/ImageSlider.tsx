@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { ESLIDER_ACTION_TYPE } from "../types";
 
 interface ImageSliderProps {
@@ -11,6 +11,25 @@ interface ImageSliderProps {
 
 function ImageSlider(props: ImageSliderProps) {
   const { image, changeActiveImage, activeImage } = props;
+  const touchStartRef = useRef<number | null>(null);
+  const touchEndRef = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
+    touchStartRef.current = e.touches[0].clientX;
+  };
+  const onTouchMove = (e: React.TouchEvent<HTMLImageElement>) => {
+    touchEndRef.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = () => {
+    if (!touchStartRef?.current) return;
+    if (!touchEndRef?.current) return;
+    const diff = touchStartRef?.current - touchEndRef?.current;
+    console.log("Diff: ", diff);
+    if (diff < -50) {
+      changeActiveImage(ESLIDER_ACTION_TYPE.PREV);
+    } else if (diff > 50) {
+      changeActiveImage(ESLIDER_ACTION_TYPE.NEXT);
+    }
+  };
   if (image !== activeImage) return null;
   return (
     <>
@@ -24,6 +43,9 @@ function ImageSlider(props: ImageSliderProps) {
         src={image}
         alt={`alternateImage-${image}`}
         className="image-slider"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       />
       <button
         className="next"

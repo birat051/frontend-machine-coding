@@ -60,6 +60,7 @@ function App() {
       <div className="slider-carousel">
         {images.map((_, index) => (
           <div
+            key={`${index}-circle`}
             style={{
               height: "10px",
               width: "10px",
